@@ -231,14 +231,21 @@ The code listings in Figures 1 - 4 illustrate these steps
 with a working program that fits a logistic regression model to random
 data.
 
-.. _Figure 1:
-.. figure:: logreg1.pdf
-    :scale: 80%
-    :figclass: h
+.. code-block:: python
+    :linenos:
 
-    Logistic regression, part 1: declaring variables.
+    import numpy
+    import theano.tensor as T
+    from theano import shared, function
 
-The code in `Figure 1`_ declares four symbolic variables ``x``, ``y``
+    x = T.matrix()
+    y = T.lvector()
+    w = shared(numpy.random.randn(100))
+    b = shared(numpy.zeros(()))
+    print "Initial model:"
+    print w.get_value(), b.get_value()
+
+The code in Figure 1 declares four symbolic variables ``x``, ``y``
 ``w``, and ``b`` to represent the data and parameters of the model.
 Each tensor variable is
 strictly typed to include its data type, its number of dimensions, and the
@@ -258,14 +265,17 @@ A shared variable's value is maintained
 throughout the execution of the program and
 can be accessed with ``.get_value()`` and ``.set_value()``, as shown in line 10.
 
-.. _Figure 2:
-.. figure:: logreg2.pdf
-    :scale: 80%
-    :figclass: h
+.. code-block:: python
+    :linenos:
+    :linenostart: 11
 
-    Logistic regression, part 2: the computation graph.
+    p_1 = 1 / (1 + T.exp(-T.dot(x, w)-b))
+    xent = -y*T.log(p_1) - (1-y)*T.log(1-p_1)
+    cost = xent.mean() + 0.01*(w**2).sum()
+    gw,gb = T.grad(cost, [w,b])
+    prediction = p_1 > 0.5
 
-The code in `Figure 2`_ specifies the computational graph required to perform
+The code in Figure 2 specifies the computational graph required to perform
 stochastic gradient descent on the parameters of our cost function. Since
 Theano's interface shares much in
 common with that of NumPy, lines 11-15 should be self-explanatory for anyone
@@ -286,14 +296,18 @@ and :math:`\partial E / \partial b` respectively.
 Finally, line 15 defines the actual prediction (``prediction``) of the logistic
 regression by thresholding :math:`P(Y=1|x^{(i)})`.
 
-.. _Figure 3:
-.. figure:: logreg3.pdf
-    :scale: 80%
-    :figclass: h
+.. code-block:: python
+    :linenos:
+    :linenostart: 16
 
-    Logistic regression, part 3: compilation.
+    predict = function(inputs=[x],
+                       outputs=prediction)
+    train = function(
+                inputs=[x,y],
+                outputs=[prediction, xent],
+                updates={w:w-0.1*gw, b:b-0.1*gb})
 
-The code of `Figure 3`_ creates the two functions required to train and
+The code of Figure 3 creates the two functions required to train and
 test our logistic regression model. Theano functions are
 callable objects that compute zero or more *outputs*
 from values given for one or more symbolic *inputs*. For example, the
@@ -304,7 +318,7 @@ a convenience to the user.
 
 .. Since this value is a function of both ``x`` and ``y``, these are given as input to the function.
 
-Line 18 (`Figure 3`_) which creates the ``train`` function highlights two other important
+Line 18 (Figure 3) which creates the ``train`` function highlights two other important
 features of Theano functions: the potential for multiple outputs and updates.
 In our example, ``train`` computes both
 the prediction (``prediction``) of the classifier as well as the cross-entropy
@@ -320,14 +334,23 @@ function will update the parameters ``w`` and ``b`` with new values as per the
 SGD algorithm.
 
 
-.. _Figure 4:
-.. figure:: logreg4.pdf
-    :scale: 80%
-    :figclass: h
+.. code-block:: python
+    :linenos:
+    :linenostart: 22
 
-    Logistic regression, part 4: computation.
+    N = 4
+    feats = 100
+    D = (numpy.random.randn(N, feats),
+         numpy.random.randint(size=N,low=0, high=2))
+    training_steps = 10
+    for i in range(training_steps):
+        pred, err = train(D[0], D[1])
+    print "Final model:",
+    print w.get_value(), b.get_value()
+    print "target values for D", D[1]
+    print "prediction on D", predict(D[0])
 
-Our example concludes (`Figure 4`_) by using the functions
+Our example concludes (Figure 4) by using the functions
 ``train`` and ``predict`` to fit the logistic regression model.
 Our data ``D`` in this example is just four random vectors and labels.
 Repeatedly calling the ``train`` function (lines 27-28) fits
