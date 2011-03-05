@@ -227,7 +227,7 @@ Theano involves the following four conceptual steps:
 (2) using these variables to build a symbolic expression graph,
 (3) compiling Theano functions, and
 (4) calling said functions to perform numerical computations.
-The code listings in Figures 1 - 4 illustrate these steps
+The code listings illustrate these steps
 with a working program that fits a logistic regression model to random
 data.
 
@@ -245,7 +245,7 @@ data.
     print "Initial model:"
     print w.get_value(), b.get_value()
 
-The code in Figure 1 declares four symbolic variables ``x``, ``y``
+The code in the above listing declares four symbolic variables ``x``, ``y``
 ``w``, and ``b`` to represent the data and parameters of the model.
 Each tensor variable is
 strictly typed to include its data type, its number of dimensions, and the
@@ -275,7 +275,7 @@ can be accessed with ``.get_value()`` and ``.set_value()``, as shown in line 10.
     gw,gb = T.grad(cost, [w,b])
     prediction = p_1 > 0.5
 
-The code in Figure 2 specifies the computational graph required to perform
+The code in lines 11-15 specifies the computational graph required to perform
 stochastic gradient descent on the parameters of our cost function. Since
 Theano's interface shares much in
 common with that of NumPy, lines 11-15 should be self-explanatory for anyone
@@ -307,7 +307,7 @@ regression by thresholding :math:`P(Y=1|x^{(i)})`.
                 outputs=[prediction, xent],
                 updates={w:w-0.1*gw, b:b-0.1*gb})
 
-The code of Figure 3 creates the two functions required to train and
+The code in lines 16-21 creates the two functions required to train and
 test our logistic regression model. Theano functions are
 callable objects that compute zero or more *outputs*
 from values given for one or more symbolic *inputs*. For example, the
@@ -318,7 +318,7 @@ a convenience to the user.
 
 .. Since this value is a function of both ``x`` and ``y``, these are given as input to the function.
 
-Line 18 (Figure 3) which creates the ``train`` function highlights two other important
+Line 18 which creates the ``train`` function highlights two other important
 features of Theano functions: the potential for multiple outputs and updates.
 In our example, ``train`` computes both
 the prediction (``prediction``) of the classifier as well as the cross-entropy
@@ -350,7 +350,7 @@ SGD algorithm.
     print "target values for D", D[1]
     print "prediction on D", predict(D[0])
 
-Our example concludes (Figure 4) by using the functions
+Our example concludes by using the functions
 ``train`` and ``predict`` to fit the logistic regression model.
 Our data ``D`` in this example is just four random vectors and labels.
 Repeatedly calling the ``train`` function (lines 27-28) fits
